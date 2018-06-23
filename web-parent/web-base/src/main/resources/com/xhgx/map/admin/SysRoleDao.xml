@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.role.dao.RoleDao">
+
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.role.entity.RoleEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.role.entity.RoleEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select t.*,c.comp_name from tb_sys_role t
+		left join tb_sys_company c on c.id = t.comp_id
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+	
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int" >
+		select count(*) from tb_sys_role 
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+	
+	
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id} 
+			</if>
+			<if test="compId != null and compId.trim() != ''">
+				and comp_id = #{compId} 
+			</if>
+			<if test="roleName != null and roleName.trim() != ''">
+<!-- 				and role_name like concat('%',#{roleName},'%') -->
+				and role_name like '%${roleName}%'
+			</if>
+			<if test="valRoleName != null and valRoleName.trim() != ''">
+				and role_name = #{valRoleName} 
+			</if>
+			<if test="intro != null and intro.trim() != ''">
+				and intro = #{intro} 
+			</if>
+			<if test="useable != null and useable.trim() != '' and useable != '0'">
+				and useable = #{useable} 
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.role.entity.RoleEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id"   >
+		insert into tb_sys_role
+			(
+				id,
+				comp_id,
+				role_name,
+				intro,
+				useable,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#{id},
+				#{compId},
+				#{roleName},
+				#{intro},
+				#{useable},
+				#{createBy},
+				#{createDate}
+			)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.role.entity.RoleEntity">
+		update tb_sys_role
+		<set>
+			<if test="compId != null"> comp_id  = #{compId}, </if>
+			<if test="roleName != null"> role_name  = #{roleName}, </if>
+			<if test="intro != null"> intro  = #{intro}, </if>
+			<if test="useable != null and useable != '0'"> useable  = #{useable}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.role.entity.RoleEntity">
+		delete from tb_sys_role where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_role where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.role.entity.RoleEntity">
+		select * from tb_sys_role where id = #{id}
+	</select>
+	
+	
+</mapper>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.dicttype.dao.DictTypeDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_dicttype t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_dicttype
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="typeName != null and typeName.trim() != ''">
+				and type_name like '%${typeName}%'
+			</if>
+			<if test="typeCode != null and typeCode.trim() != ''">
+				and type_code = #{typeCode}
+			</if>
+			<if test="sort != null and sort != '0'">
+				and sort = #{sort}
+			</if>
+			<if test="levelnum != null and levelnum != '0'">
+				and levelnum = #{levelnum}
+			</if>
+			<if test="intro != null and intro.trim() != ''">
+				and intro = #{intro}
+			</if>
+			<if test="parentId != null and parentId.trim() != ''">
+				and parent_id = #{parentId}
+			</if>
+			<if test="createBy != null and createBy.trim() != '' and createBy != '0'">
+				and create_by = #{createBy}
+			</if>
+			<if
+				test="createDate != null and createDate.trim() != '' and createDate != '0'">
+				and create_date = #{createate}
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_dicttype
+		(
+		id,
+		type_name,
+		type_code,
+		sort,
+		levelnum,
+		intro,
+		parent_id,
+		create_by,
+		create_date
+		)
+		values
+		(
+		#{id},
+		#{typeName},
+		#{typeCode},
+		#{sort},
+		#{levelnum},
+		#{intro},
+		#{parentId},
+		#{createBy},
+		#{createDate}
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity">
+		update tb_sys_dicttype
+		<set>
+			<if test="typeName != null"> type_name = #{typeName}, </if>
+			<if test="typeCode != null"> type_code = #{typeCode}, </if>
+			<if test="sort != null and sort != '0'"> sort = #{sort}, </if>
+			<if test="levelnum != null and levelnum != '0'"> levelnum = #{levelnum}, </if>
+			<if test="intro != null"> intro = #{intro}, </if>
+			<if test="parentId != null"> parent_id = #{parentId}, </if>
+			<if test="createBy != null"> create_by = #{createBy}, </if>
+			<if test="createDate != null"> create_date = #{createDate}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity">
+		delete from tb_sys_dicttype
+		where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_dicttype where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity">
+		select * from tb_sys_dicttype where
+		id = #{id}
+	</select>
+
+	<!-- 查询不分页列表 -->
+	<select id="queryAllObj" resultType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity">
+		select * from
+		tb_sys_dicttype where 1 = 1
+	</select>
+	
+	<!-- 根据字典类型code查询字典类型id -->
+	<select id="getTypeIdByTypeCode" resultType="java.lang.String">
+		select id from
+		tb_sys_dicttype where type_code = #{typeCode}
+	</select>
+	
+	<!-- 根据字典类型id查询字典类型code -->
+	<select id="getTypeCodeByTypeId" resultType="java.lang.String">
+		select type_code from
+		tb_sys_dicttype where id = #{id}
+	</select>
+	
+	<select id="queryDicttypeTree" resultType="map" >
+
+			select r.id ID,r.parent_id PID,r.type_name NAME,r.intro TITLE
+			from tb_sys_dicttype r 
+			<if test="compId != null and compId.trim() != ''">
+				where r.id in(select d.dicttype_id from tb_sys_dicttype_comp d where d.comp_id = #{compId} )
+			</if>
+			
+			order by r.type_code asc
+
+	</select>
+	
+	<select id="getDicttypeLeftJoinChecked" resultType="map" >
+
+			select r.id ID,r.parent_id PID,r.type_name NAME,c.comp_id COMPID
+				from tb_sys_dicttype r
+				LEFT JOIN tb_sys_dicttype_comp c ON c.dicttype_id=r.id  
+				and c.comp_id=#{compId}
+				order by r.type_code asc
+
+	</select>
+	<!-- 根据字典类型的typeCode查询出其下的所有字典类型 -->
+	<select id="getSubDictTypeByTypeCode" resultType="com.xhgx.web.admin.dicttype.entity.DictTypeEntity">
+		select * 
+		from tb_sys_dicttype dtype
+		where dtype.parent_id=(
+			select id
+				from tb_sys_dicttype 
+			where type_code=#{typeCode}
+		)
+	</select>
+	
+
+</mapper>

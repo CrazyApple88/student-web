@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.menu.dao.MenuDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.menu.entity.MenuEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.menu.entity.MenuEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_menu t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_menu 
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id} 
+			</if>
+			<if test="parentId != null and parentId.trim() != ''">
+				and parent_id = #{parentId} 
+			</if>
+			<if test="menuName != null and menuName.trim() != ''">
+				and menu_name like '%${menuName}%'
+			</if>
+			<if test="menuCode != null and menuCode.trim() != ''">
+				and menu_code = #{menuCode} 
+			</if>
+			<if test="menuType != null and menuType.trim() != ''">
+				and menu_type = #{menuType} 
+			</if>
+			<if test="authTab != null and authTab.trim() != ''">
+				and auth_tab = #{authTab} 
+			</if>
+			<if test="languageCode != null and languageCode.trim() != ''">
+				and language_code = #{languageCode} 
+			</if>
+			<if test="levelnum != null and levelnum.trim() != '' and levelnum != '0'">
+				and levelnum = #{levelnum} 
+			</if>
+			<if test="sort != null and sort.trim() != '' and sort != '0'">
+				and sort = #{sort} 
+			</if>
+			<if test="url != null and url.trim() != ''">
+				and url = #{url} 
+			</if>
+			<if test="icon != null and icon.trim() != ''">
+				and icon = #{icon} 
+			</if>
+			<if test="intro != null and intro.trim() != ''">
+				and intro = #{intro} 
+			</if>
+			<if test="useable != null and useable.trim() != '' and useable != '0'">
+				and useable = #{useable} 
+			</if>
+			<if test="isMobile != null and isMobile.trim() != '' and isMobile != '0'">
+				and is_mobile = #{isMobile} 
+			</if>
+			<if test="mobileUrl != null and mobileUrl.trim() != ''">
+				and mobileUrl = #{mobileUrl} 
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.menu.entity.MenuEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id"   >
+		insert into tb_sys_menu
+			(
+				id,
+				parent_id,
+				menu_name,
+				menu_code,
+				menu_type,
+				auth_tab,
+				language_code,
+				levelnum,
+				sort,
+				url,
+				icon,
+				intro,
+				useable,
+				is_mobile,
+				mobile_url,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#{id},
+				#{parentId},
+				#{menuName},
+				#{menuCode},
+				#{menuType},
+				#{authTab},
+				#{languageCode},
+				#{levelnum},
+				#{sort},
+				#{url},
+				#{icon},
+				#{intro},
+				#{useable},
+				#{isMobile},
+				#{mobileUrl},
+				#{createBy},
+				#{createDate}
+			)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.menu.entity.MenuEntity">
+		update tb_sys_menu
+		<set>
+			<if test="parentId != null"> parent_id  = #{parentId}, </if>
+			<if test="menuName != null"> menu_name  = #{menuName}, </if>
+<!-- 			<if test="menuCode != null"> menu_code  = #{menuCode}, </if> -->
+			<if test="menuType != null"> menu_type  = #{menuType}, </if>
+			<if test="authTab != null"> auth_tab  = #{authTab}, </if>
+			<if test="languageCode != null"> language_code  = #{languageCode}, </if>
+<!-- 			<if test="levelnum != null and levelnum != '0'"> levelnum  = #{levelnum}, </if> -->
+			<if test="sort != null and sort != '0'"> sort  = #{sort}, </if>
+			<if test="url != null"> url  = #{url}, </if>
+			<if test="icon != null"> icon  = #{icon}, </if>
+			<if test="intro != null"> intro  = #{intro}, </if>
+			<if test="useable != null and useable != '0'"> useable  = #{useable}, </if>
+			<if test="isMobile != null and isMobile != '0'"> is_mobile  = #{isMobile}, </if>
+			<if test="mobileUrl != null"> mobile_url  = #{mobileUrl}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.menu.entity.MenuEntity">
+		delete from tb_sys_menu where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_menu where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.menu.entity.MenuEntity">
+		select * from tb_sys_menu where id = #{id}
+	</select>
+	
+	<select id="queryMenuTreeByParams" resultType="map" >
+			select r.id ID,r.parent_id PID,r.menu_name NAME,intro TITLE
+			from tb_sys_menu r
+			<if test="useable != null and useable != '0'">
+				where useable = #{useable} 
+			</if>
+			order by r.sort,r.menu_code asc
+	</select>
+	
+	<!-- 获取访问权限/授权权限菜单 -->
+	<select id="getMenusLeftJoinChecked" resultType="map" >
+			<if test="loginUserId == null || loginUserId.trim() == ''">
+				select r.id ID,r.parent_id PID,r.menu_name NAME,mc.relation_id as CHECKED,r.id MENU_ID
+				from tb_sys_menu r
+				LEFT JOIN tb_sys_menu_center mc ON mc.menu_id=r.id  
+				and mc.relation_id=#{relationId}
+				and mc.relation_type=#{relationType}
+				and mc.auth_type=#{authType}
+				where r.useable = '1'
+				order by r.menu_code asc
+			</if>
+			<if test="loginUserId != null and loginUserId.trim() != ''">
+				select r.id ID,r.parent_id PID,r.menu_name NAME,mc.relation_id as CHECKED,login_auth_menu.menu_id MENU_ID
+				from tb_sys_menu r
+				LEFT JOIN tb_sys_menu_center mc ON mc.menu_id=r.id  
+				and mc.relation_id=#{relationId}
+				and mc.relation_type=#{relationType}
+				and mc.auth_type=#{authType}
+				left join (SELECT
+						distinct mcq.menu_id menu_id
+					FROM
+						tb_sys_menu_center mcq
+					WHERE
+						mcq.auth_type = '2' and 
+						(
+							(mcq.relation_id = #{loginUserId}  and mcq.relation_type = '1')
+							OR (
+								mcq.relation_id IN (
+									SELECT
+										ur.role_id
+									FROM
+										tb_sys_user_role ur
+									WHERE
+										ur.user_id = #{loginUserId}
+								)
+								 and mcq.relation_type = '2'
+							)
+							OR (
+								mcq.relation_id IN (
+									SELECT
+										ud.dept_id
+									FROM
+										tb_sys_user_dept ud
+									WHERE
+										ud.user_id = #{loginUserId}
+								)
+								 and mcq.relation_type = '3'
+							)
+						)
+						) login_auth_menu  ON login_auth_menu.menu_id=r.id  
+						where r.useable = '1'
+						order by r.menu_code asc
+			</if>
+	</select>
+	
+	
+	<select id="queryMenuParentId" resultType="map" >
+
+			SELECT t.levelnum LEVELNUM,t.menu_code MENUCODE,
+			(select max(m.menu_code) from tb_sys_menu m where m.parent_id = #{parentId}) MAXMENUCODE 
+			FROM tb_sys_menu t where t.id = #{parentId}
+
+	</select>
+	
+	
+	<select id="getMenuList"  resultType="com.xhgx.web.admin.menu.entity.MenuEntity">
+			select * from tb_sys_menu m
+			<if test="levelnum != null and levelnum.trim() != '' and levelnum != '0'">
+				and levelnum = #{levelnum} 
+			</if>
+	</select>
+	<!-- 根据 pid、sort和target_sort查询拖拽时所有受影响的菜单信息 --> 
+	<select id="getMenuListBySort" resultType="com.xhgx.web.admin.menu.entity.MenuEntity" >
+		select *
+		from tb_sys_menu 
+		where sort between #{sort} and #{targetSort} and parent_id= #{parentId}
+	</select> 
+</mapper>

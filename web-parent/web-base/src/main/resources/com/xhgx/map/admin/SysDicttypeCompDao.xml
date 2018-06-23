@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.dicttype.dao.DictTypeCompDao">
+
+	
+	<!-- 单个绑定字典类型和企业关系 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.dicttype.entity.DictTypeCompEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+		insert into tb_sys_dicttype_comp(id,dicttype_id,comp_id) 
+		values
+		(#{id},#{dicttypeId},#{compId})
+	</insert>
+	
+	<!-- 批量字典类型和企业关系 -->
+	<insert id="saveDicttypeCompBatch" parameterType="java.util.List"  useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+			insert into tb_sys_dicttype_comp(id,dicttype_id,comp_id) 
+			values
+			<foreach collection="list" item="item" index="index" separator="," >  
+			(#{item.id},#{item.dicttypeId},#{item.compId})
+			</foreach>
+			
+	</insert>
+	
+	
+	<!-- 删除字典类型和企业关系，根据字典类型ID -->
+	<delete id="deleteDicttypeCompByTypeId">
+		delete from tb_sys_dicttype_comp where dicttype_id = #{typeId}
+	</delete>
+	
+	<!-- 删除契合和字典类型关系，根据企业ID -->
+	<delete id="deleteDicttypeCompByCompId">
+		delete from tb_sys_dicttype_comp where comp_id = #{compId}
+	</delete>
+	
+</mapper>

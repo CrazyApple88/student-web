@@ -1,0 +1,205 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.dept.dao.DeptDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dept.entity.DeptEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dept.entity.DeptEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select t.*,c.comp_name comp_name from tb_sys_dept t
+		left join tb_sys_company c on c.id = t.comp_id
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_dept t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="parentId != null and parentId.trim() != ''">
+				and parent_id = #{parentId}
+			</if>
+			<if test="deptName != null and deptName.trim() != ''">
+				and dept_name like '%${deptName}%'
+			</if>
+			<if test="deptNameAll != null and deptNameAll.trim() != ''">
+				and dept_name = #{deptNameAll}
+			</if>
+			<if test="deptCode != null and deptCode.trim() != ''">
+				and dept_code = #{deptCode}
+			</if>
+			<if test="levelnum != null and levelnum != '0'">
+				and levelnum = #{levelnum}
+			</if>
+			<if test="compId != null and compId.trim() != ''">
+				and comp_id = #{compId}
+			</if>
+			<if test="sort != null and sort != '0'">
+				and sort = #{sort}
+			</if>
+			<if test="personName != null and personName.trim() != ''">
+				and person_name = #{personName}
+			</if>
+			<if test="personMobile != null and personMobile.trim() != ''">
+				and person_mobile = #{personMobile}
+			</if>
+			<if test="deptPhone != null and deptPhone.trim() != ''">
+				and dept_phone = #{deptPhone}
+			</if>
+			<if test="deptAddr != null and deptAddr.trim() != ''">
+				and dept_addr = #{deptAddr}
+			</if>
+			<if test="byUserId != null and byUserId.trim() != ''">
+				and t.id in(select ud.dept_id from tb_sys_user_dept ud where ud.user_id = #{byUserId});
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存用户信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.dept.entity.DeptEntity"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_dept
+		(
+		id,
+		parent_id,
+		dept_name,
+		dept_code,
+		levelnum,
+		comp_id,
+		sort,
+		person_name,
+		person_mobile,
+		dept_phone,
+		dept_addr,
+		create_by,
+		create_date
+		)
+		values
+		(
+		#{id},
+		#{parentId},
+		#{deptName},
+		#{deptCode},
+		#{levelnum},
+		#{compId},
+		#{sort},
+		#{personName},
+		#{personMobile},
+		#{deptPhone},
+		#{deptAddr},
+		#{createBy},
+		#{createDate}
+		)
+	</insert>
+
+	<!-- 修改用户信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.dept.entity.DeptEntity">
+		update tb_sys_dept
+		<set>
+			<if test="parentId != null"> parent_id = #{parentId}, </if>
+			<if test="deptName != null"> dept_name = #{deptName}, </if>
+			<if test="deptCode != null"> dept_code = #{deptCode}, </if>
+			<if test="levelnum != null and levelnum != '0'"> levelnum = #{levelnum}, </if>
+			<if test="compId != null"> comp_id = #{compId}, </if>
+			<if test="sort != null and sort != '0'"> sort = #{sort}, </if>
+			<if test="personName != null"> person_name = #{personName}, </if>
+			<if test="personMobile != null"> person_mobile = #{personMobile}, </if>
+			<if test="deptPhone != null"> dept_phone = #{deptPhone}, </if>
+			<if test="deptAddr != null"> dept_addr = #{deptAddr}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.dept.entity.DeptEntity">
+		delete from tb_sys_dept where
+		id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_dept where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询用户信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.dept.entity.DeptEntity">
+		select * from tb_sys_dept where id =
+		#{id}
+	</select>
+
+	<!-- 查询不分页列表 -->
+	<select id="queryAllObj" resultType="com.xhgx.web.admin.dept.entity.DeptEntity">
+		select * from tb_sys_dept where 1 = 1
+	</select>
+	
+	<select id="queryMenuTree" resultType="map" >
+			select r.id ID,r.parent_id PID,r.dept_name NAME,r.levelnum LEVELNUM
+			from tb_sys_dept r where 1 = 1
+			<if test="compId != null and compId.trim() != ''">
+				and r.comp_id = #{compId} 
+			</if>
+			order by r.sort,r.dept_code asc
+	</select>
+	
+	<select id="queryDeptParentId" resultType="map" >
+			SELECT t.levelnum LEVELNUM,t.dept_code DEPTCODE,
+			(select max(m.dept_code) from tb_sys_dept m where m.parent_id = #{parentId}) MAXDEPTCODE 
+			FROM tb_sys_dept t where t.id = #{parentId}
+	</select>
+	
+	<select id="queryMaxDeptCodeParentId" resultType="map" >
+			select max(m.dept_code) MAXDEPTCODE from tb_sys_dept m where m.parent_id = #{parentId}
+	</select>
+	<!-- 根据 pid、sort和target_sort查询拖拽时所有受影响的部门信息 --> 
+	<select id="getDeptListBySort" resultType="com.xhgx.web.admin.dept.entity.DeptEntity" >
+		select *
+		from tb_sys_dept 
+		where sort between #{sort} and #{targetSort} and parent_id= #{parentId}
+	</select> 
+</mapper>

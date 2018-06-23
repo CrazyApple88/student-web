@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.user.dao.UserDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.user.entity.UserEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.user.entity.UserEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select t.*,c.comp_name comp_name from tb_sys_user t
+		left join tb_sys_company c on c.id = t.comp_id
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_user  t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and t.id = #{id} 
+			</if>
+			<if test="compId != null and compId.trim() != ''">
+				and t.comp_id = #{compId} 
+			</if>
+			<if test="userName != null and userName.trim() != ''">
+				and t.user_name like '%${userName}%'
+			</if>
+			<if test="realName != null and realName.trim() != ''">
+				and t.real_name like '%${realName}%'
+			</if>
+			<if test="idCard != null and idCard.trim() != ''">
+				and t.id_card = #{idCard} 
+			</if>
+			<if test="empNo != null and empNo.trim() != ''">
+				and t.emp_no = #{empNo} 
+			</if>
+			<if test="email != null and email.trim() != ''">
+				and t.email = #{email} 
+			</if>
+			<if test="phone != null and phone.trim() != ''">
+				and t.phone = #{phone} 
+			</if>
+			<if test="address != null and address.trim() != ''">
+				and t.address = #{address} 
+			</if>
+			<if test="userType != null and userType.trim() != ''">
+				and t.user_type = #{userType} 
+			</if>
+			<if test="userPhoto != null and userPhoto.trim() != ''">
+				and t.user_photo = #{userPhoto} 
+			</if>
+			<if test="loginStatus != null and loginStatus.trim() != '' and loginStatus != '0'">
+				and t.login_status = #{loginStatus} 
+			</if>
+			<if test="1 != 2">
+				and t.is_del = 1
+			</if>
+			<if test="selectType != null and selectType == 2">
+				and t.id in(select ur.user_id from tb_sys_user_role ur where ur.role_id = #{selectId })
+			</if>
+			<if test="selectType != null and selectType == 3">
+				and t.id in(select ud.user_id from tb_sys_user_dept ud where ud.dept_id = #{selectId })
+			</if>
+			<if test="equalsRoleId != null and equalsRoleId != ''">
+				and t.id in(select ur.user_id from tb_sys_user_role ur where ur.role_id = #{roleId })
+			</if>
+			<if test="notEqualsRoleId != null and notEqualsRoleId != ''">
+				and t.id not in(select ur.user_id from tb_sys_user_role ur where ur.role_id = #{roleId })
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存用户信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.user.entity.UserEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id"   >
+		insert into tb_sys_user
+			(
+				id,
+				comp_id,
+				user_name,
+				password,
+				salt,
+				real_name,
+				id_card,
+				emp_no,
+				email,
+				phone,
+				mobile,
+				address,
+				user_type,
+				user_photo,
+				login_status,
+				is_del,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#{id},
+				#{compId},
+				#{userName},
+				#{password},
+				#{salt},
+				#{realName},
+				#{idCard},
+				#{empNo},
+				#{email},
+				#{phone},
+				#{mobile},
+				#{address},
+				#{userType},
+				#{userPhoto},
+				#{loginStatus},
+				#{isDel},
+				#{createBy},
+				#{createDate}
+			)
+	</insert>
+
+	<!-- 修改用户信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.user.entity.UserEntity">
+		update tb_sys_user
+		<set>
+			<if test="compId != null"> comp_id  = #{compId}, </if>
+<!-- 			<if test="password != null"> password  = #{password}, </if> -->
+			<if test="realName != null"> real_name  = #{realName}, </if>
+			<if test="idCard != null"> id_card  = #{idCard}, </if>
+			<if test="empNo != null"> emp_no  = #{empNo}, </if>
+			<if test="email != null"> email  = #{email}, </if>
+			<if test="phone != null"> phone  = #{phone}, </if>
+			<if test="mobile != null"> mobile  = #{mobile}, </if>
+			<if test="address != null"> address  = #{address}, </if>
+			<if test="userType != null"> user_type  = #{userType}, </if>
+			<if test="userPhoto != null"> user_photo  = #{userPhoto}, </if>
+			<if test="loginStatus != null and loginStatus != '0'"> login_status  = #{loginStatus}, </if>
+<!-- 			<if test="isDel != null and isDel != '0'"> is_del  = #{isDel}, </if> -->
+		</set>
+		where id = #{id}
+	</update>
+	
+	<!-- 修改用户密码 -->
+	<update id="updatePasswordById" parameterType="com.xhgx.web.admin.user.entity.UserEntity">
+		update tb_sys_user set password  = #{password} where id = #{id}
+	</update>
+	
+	<!-- 查询数据 -->
+	<select id="queryByUserNameAndComp" resultType="com.xhgx.web.admin.user.entity.UserEntity">
+		select * from tb_sys_user where user_name = #{userName} 
+		<if test="compId != null and compId.trim() != ''">
+			and comp_id = #{compId} and is_del = 1
+		</if>
+	</select>
+
+
+	<!-- 单条数据删除 -->
+	<!-- <delete id="delete" parameterType="com.xhgx.web.admin.user.entity.UserEntity">
+		delete from tb_sys_user where id = #{id}
+	</delete> -->
+	<update id="delete" parameterType="com.xhgx.web.admin.user.entity.UserEntity">
+		update tb_sys_user set is_del = 2 where id = #{id}
+	</update>
+
+	<!-- 根据多个ID批量删除 -->
+	<!-- <delete id="deleteBatch">
+		delete from tb_sys_user where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete> -->
+	<update id="deleteBatch">
+		update tb_sys_user set is_del = 2 where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</update>
+
+	<!-- 根据ID查询用户信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.user.entity.UserEntity">
+		select t.* from tb_sys_user t
+		where id = #{id}
+	</select>
+	
+	<!-- 单个绑定用户角色关系 -->
+	<insert id="updateUserRoleAdd">
+		insert into tb_sys_user_role(id,user_id,role_id) values(#{id},#{userId},#{roleId})
+	</insert>
+	
+	<!-- 批量绑定用户角色关系 -->
+	<insert id="saveUserRoleBatch" parameterType="java.util.List">
+		insert into tb_sys_user_role(id,user_id,role_id) 
+		values
+		<foreach collection="list" item="item" index="index" separator="," >  
+		(#{item.id},#{item.userId},#{item.roleId})
+		</foreach>
+	</insert>
+	
+	
+	<!-- 删除用户角色关系 -->
+	<delete id="delUserRoleByUserId">
+		delete from tb_sys_user_role where user_id = #{userId}
+	</delete>
+	
+	<!-- 删除用户角色关系 -->
+	<delete id="delUserRoleByRoleId">
+		delete from tb_sys_user_role where role_id = #{roleId}
+	</delete>
+    
+	<select id="getRolesLeftJoinUserChecked" resultType="map" >
+			select r.id ID,r.role_name ROLENAME,r.COMP_ID COMPID,ur.role_id as ROLEID
+			from tb_sys_role r
+			LEFT JOIN tb_sys_user_role ur ON ur.role_id=r.id  and ur.user_id=#{userId}
+			where r.comp_id=#{compId}
+	</select>
+	
+	<select id="getDeptsLeftJoinUserChecked" resultType="map" >
+			select r.id ID,r.parent_id PID,r.dept_name DEPTNAME,r.comp_id,ur.dept_id as DEPT_ID
+			from tb_sys_dept r
+			LEFT JOIN tb_sys_user_dept ur ON ur.dept_id=r.id  and ur.user_id=#{userId}
+			where r.comp_id=#{compId}
+			order by r.dept_code asc
+	</select>
+	<!-- 查询该企业下所有不隶属于任何部门的用户 -->
+	<select id="getUsersByCompNotDept" resultType="map">
+		select u.id USERID,u.user_name USERNAME,u.real_name REALNAME,d.id ID,d.dept_name DEPTNAME
+		from tb_sys_company c,tb_sys_user u,tb_sys_dept d
+		where u.is_del='1' AND c.id=#{compId} AND d.comp_id=c.id AND d.parent_id='0' AND u.id NOT IN
+ 		(select ur.user_id
+		from tb_sys_user_dept ur,tb_sys_dept d
+		where d.id=ur.dept_id AND d.comp_id=#{compId}) 
+		order by u.id asc
+	</select>
+	<!-- 查询该企业下所有隶属于部门的用户及对应的部门信息-->
+	<select id="getUserByCompInDept" resultType="map">
+		select u.id USERID,u.user_name USERNAME,u.real_name REALNAME,r.id ID,r.parent_id PID,r.dept_name DEPTNAME,r.comp_id,ur.dept_id as DEPT_ID
+			from tb_sys_user u,tb_sys_dept r,tb_sys_user_dept ur 
+			where ur.dept_id=r.id and ur.user_id=u.id and u.is_del='1' and r.comp_id=#{compId}
+			order by r.dept_code asc
+	</select>
+	<!-- 查询数据 根据用户ID查询用户所能拥有的菜单权限列表，如果没有id则是超级管理员admin-->
+	<select id="getMenuByUserId" resultType="com.xhgx.web.admin.menu.entity.MenuEntity">
+<!-- 		select * from tb_sys_menu m where m.id in(select mc.menu_id from tb_sys_menu_center mc where mc.relation_id = #{userId} ); -->
+<!-- 		select * from tb_sys_menu m where m.id in(select mc.menu_id from tb_sys_menu_center mc where mc.relation_id in (select ur.role_id from tb_sys_user_role ur where ur.user_id = #{userId}) ); -->
+<!-- 		select * from tb_sys_menu m where m.id in(select mc.menu_id from tb_sys_menu_center mc where mc.relation_id in (select ud.dept_id from tb_sys_user_dept ud where ud.user_id = #{userId}) ); -->
+			SELECT
+				*
+			FROM
+				tb_sys_menu m
+				WHERE m.useable = '1'
+			<if test="userId != null and userId.trim() != ''">
+			and m.id IN (
+					SELECT
+						mc.menu_id
+					FROM
+						tb_sys_menu_center mc
+					WHERE
+						mc.auth_type = #{authType} and 
+						(
+							(mc.relation_id = #{userId} and mc.relation_type = '1')
+							OR (
+								mc.relation_id IN (
+									SELECT
+										ur.role_id
+									FROM
+										tb_sys_user_role ur
+									WHERE
+										ur.user_id = #{userId}
+								)
+								 and mc.relation_type = '2'
+							)
+							OR (
+								mc.relation_id IN (
+									SELECT
+										ud.dept_id
+									FROM
+										tb_sys_user_dept ud
+									WHERE
+										ud.user_id = #{userId}
+								)
+								 and mc.relation_type = '3'
+							)
+						)
+			)
+			</if>
+			order by m.sort,m.menu_code asc
+		
+	</select>
+	
+	<!-- 查询不分页列表 -->
+	<select id="queryAllObj" resultType="com.xhgx.web.admin.user.entity.UserEntity">
+		select * from tb_sys_user where  is_del = 1
+	</select>
+</mapper>

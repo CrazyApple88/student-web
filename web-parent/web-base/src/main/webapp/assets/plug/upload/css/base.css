@@ -1,0 +1,100 @@
+html, body, ul, li, ol, dl, dd, dt, p, h1, h2, h3, h4, h5, h6, form, fieldset, legend, img {
+  margin: 0;
+  padding: 0;
+}
+
+fieldset, img {
+  border: none;
+}
+
+ul, ol, li {
+  list-style: none;
+}
+
+body {
+  color: #333;
+  font: 12px/20px "Microsoft Yahei","Arial Narrow",HELVETICA;
+}
+
+address, caption, cite, code, dfn, th, var {
+  font-style: normal;
+  font-weight: normal;
+}
+
+.left {
+  float: left !important;
+}
+
+.right {
+  float: right !important;
+}
+
+a {
+  color: #333;
+  text-decoration: none;
+}
+a:hover, a:active, a:focus, a:visited {
+  color: #333;
+  text-decoration: none;
+}
+
+input, select, button, a {
+  border: none;
+  outline: none;
+}
+
+.clearboth {
+  clear: both;
+  height: auto;
+  overflow: hidden;
+}
+
+.font12 {
+  font-size: 12px;
+}
+
+.font14 {
+  font-size: 14px;
+}
+
+.font30 {
+  font-size: 30px;
+}
+
+.b_ra3 {
+  border-radius: 3px;
+  -moz-border-radius: 3px;
+  -webkit-border-radius: 3px;
+}
+
+.b_ra5 {
+  border-radius: 5px;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+}
+
+.relative {
+  position: relative;
+}
+
+.marginlf15 {
+  margin-left: 15px;
+}
+
+.marginrg15 {
+  margin-right: 15px;
+}
+
+.ableft {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.abright {
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+/*# sourceMappingURL=base.css.map */

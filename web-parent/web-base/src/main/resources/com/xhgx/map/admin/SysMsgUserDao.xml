@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.msgUser.dao.MsgUserDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.msgUser.entity.MsgUser"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.msgUser.entity.MsgUser"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_msg_user t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_msg_user
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="userId != null and userId.trim() != ''">
+				and user_id like '%${userId}%'
+			</if>
+			<if test="msgId != null and msgId.trim() != ''">
+				and msg_id like '%${msgId}%'
+			</if>
+			<if test="status != null and status.trim() != ''">
+				and status like '%${status}%'
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.msgUser.entity.MsgUser"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_msg_user
+		(
+		id,			 
+		user_id,			 
+		msg_id,			 
+		status			 
+		)
+		values
+		(
+		#{id},			 
+		#{userId},			 
+		#{msgId},			 
+		#{status}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.msgUser.entity.MsgUser">
+		update tb_sys_msg_user
+		<set>
+				<if test="userId != null"> user_id = #{userId}, </if>
+				<if test="msgId != null"> msg_id = #{msgId}, </if>
+				<if test="status != null"> status = #{status}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.msgUser.entity.MsgUser">
+		delete from tb_sys_msg_user
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据msgId删除数据 -->
+	<delete id="deleteByMsgId" parameterType="String">
+		delete from tb_sys_msg_user
+		where msg_id=#{msgId}
+	</delete>
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_msg_user where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.msgUser.entity.MsgUser">
+		select * from tb_sys_msg_user where
+		id = #{id}
+	</select>
+	
+	<!-- 根据userId、msgId将信息标为已读 -->
+	<update id="modifyMsgStatus" parameterType="com.xhgx.web.admin.msgUser.entity.MsgUser">
+		update tb_sys_msg_user
+		set status='1'
+		where msg_id=#{msgId} and user_id=#{userId}
+	</update>
+</mapper>

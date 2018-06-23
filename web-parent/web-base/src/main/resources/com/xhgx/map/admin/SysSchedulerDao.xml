@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.scheduler.dao.SchedulerDao">
+
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.scheduler.entity.Scheduler"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.scheduler.entity.Scheduler"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_scheduler t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_scheduler
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="name != null and name.trim() != ''">
+				and name like '%${name}%'
+			</if>
+			<if test="jobtype != null and jobtype.trim() != ''">
+				and jobType like '%${jobType}%'
+			</if>
+			<if test="corn != null and corn.trim() != ''">
+				and corn like '%${corn}%'
+			</if>
+			<if test="parm != null and parm.trim() != ''">
+				and parm like '%${parm}%'
+			</if>
+			<if test="state != null ">
+				and state  = #{state}
+			</if>
+			
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.scheduler.entity.Scheduler"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_scheduler
+		(
+		id,			 
+		name,			 
+		jobType,
+		corn,			 
+		parm,			 
+		entityClass,			 
+		startTime,			 
+		entTime,			 
+		repeatCount,			 
+		repeatInterval,			 
+		count,			 
+		state			 
+		)
+		values
+		(
+		#{id},			 
+		#{name},			 
+		#{jobType},
+		#{corn},			 
+		#{parm},			 
+		#{entityClass},
+		#{startTime},
+		#{entTime},
+		#{repeatCount},
+		#{repeatInterval},
+		#{count},			 
+		#{state}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.scheduler.entity.Scheduler">
+		update tb_sys_scheduler
+		<set>
+				<if test="name != null"> name = #{name}, </if>
+				<if test="jobType != null"> jobType = #{jobType}, </if>
+				<if test="corn != null"> corn = #{corn}, </if>
+				<if test="parm != null"> parm = #{parm}, </if>
+				<if test="entityClass != null"> entityClass = #{entityClass}, </if>
+				<if test="startTime != null"> startTime = #{startTime}, </if>
+				<if test="entTime != null"> entTime = #{entTime}, </if>
+				<if test="repeatCount != null"> repeatCount = #{repeatCount}, </if>
+				<if test="repeatInterval != null"> repeatInterval = #{repeatInterval}, </if>
+				<if test="count != null"> count = #{count}, </if>
+				<if test="state != null"> state = #{state}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 修改信息 -->
+	<update id="executeConunt" parameterType="String">
+		update tb_sys_scheduler set count=count+1 where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.scheduler.entity.Scheduler">
+		delete from tb_sys_scheduler
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_scheduler where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.scheduler.entity.Scheduler">
+		select * from tb_sys_scheduler where
+		id = #{id}
+	</select>
+
+</mapper>

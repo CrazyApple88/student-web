@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.files.dao.FilesDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.files.entity.FilesEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.files.entity.FilesEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_files t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_files
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="fileName != null and fileName.trim() != ''">
+				and file_name like '%${fileName}%'
+			</if>
+			<if test="fileType != null and fileType.trim() != ''">
+				and file_type like '%${fileType}%'
+			</if>
+			<if test="fileDir != null and fileDir.trim() != ''">
+				and file_dir like '%${fileDir}%'
+			</if>
+			<if test="fileSize != null and fileSize.trim() != ''">
+				and file_size like '%${fileSize}%'
+			</if>
+			<if test="suffixName != null and suffixName.trim() != ''">
+				and suffix_name like '%${suffixName}%'
+			</if>
+			<if test="serviceName != null and serviceName.trim() != ''">
+				and service_name like '%${serviceName}%'
+			</if>
+			<if test="relationId != null and relationId.trim() != ''">
+				and relation_id like '%${relationId}%'
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				and create_by like '%${createBy}%'
+			</if>
+			<if test="createDate != null and createDate.trim() != ''">
+				and create_date = #{createDate}
+			</if>
+			
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.files.entity.FilesEntity"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_files
+		(
+		id,			 
+		file_name,			 
+		file_type,			 
+		file_dir,			 
+		file_size,			 
+		suffix_name,			 
+		service_name,			 
+		relation_id,			 
+		create_by,			 
+		create_date			 
+		)
+		values
+		(
+		#{id},			 
+		#{fileName},			 
+		#{fileType},			 
+		#{fileDir},			 
+		#{fileSize},			 
+		#{suffixName},			 
+		#{serviceName},			 
+		#{relationId},			 
+		#{createBy},			 
+		#{createDate}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.files.entity.FilesEntity">
+		update tb_sys_files
+		<set>
+				<if test="fileName != null"> file_name = #{fileName}, </if>
+				<if test="fileType != null"> file_type = #{fileType}, </if>
+				<if test="fileDir != null"> file_dir = #{fileDir}, </if>
+				<if test="fileSize != null"> file_size = #{fileSize}, </if>
+				<if test="suffixName != null"> suffix_name = #{suffixName}, </if>
+				<if test="serviceName != null"> service_name = #{serviceName}, </if>
+				<if test="relationId != null"> relation_id = #{relationId}, </if>
+				<if test="createBy != null"> create_by = #{createBy}, </if>
+				<if test="createDate != null"> create_date = #{createDate}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.files.entity.FilesEntity">
+		delete from tb_sys_files
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_files where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.files.entity.FilesEntity">
+		select * from tb_sys_files where
+		id = #{id}
+	</select>
+
+</mapper>

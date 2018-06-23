@@ -1,0 +1,223 @@
+  body,
+  html {
+      width: 100%;
+      height: 100%;
+  }
+  
+  * {
+      padding: 0;
+      margin: 0;
+  }
+  
+  #leftBox {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      overflow: hidden;
+  }
+  
+  #leftBox>div {
+      position: absolute;
+      height: 100%;
+      width: 100%;
+  }
+  
+  #leftBox #right,
+  #leftBox #left {
+      overflow: auto;
+      padding: 0 2px 0 2px !important;
+  }
+  
+  #leftBox #left {
+      width: 20%;
+  }
+  
+  #leftBox #right {
+      left: 20%;
+  }
+  
+  #leftBox #line {
+      left: 20%;
+      width: 8px;
+      height: 100%;
+      background: #CCC;
+      cursor: w-resize;
+      border-radius: 2px;
+  }
+  
+  #leftBox #line #lineDot {
+      line-height: 6px;
+      position: absolute;
+      top: 50%;
+      bottom: 3px;
+      margin-left: 1px;
+      margin-top: -10px;
+  }
+  
+  #leftBox #line #lineDot ul li {
+      list-style: none;
+      height: 6px;
+      width: 6px;
+      background-color: white;
+      margin-bottom: 3px;
+      border-radius: 50%;
+  }
+  
+  #leftBox #line .btns {
+      width: 20px;
+      background-color: #57afef;
+      height: 66px;
+      position: absolute;
+      top: 50%;
+      margin-top: -33px;
+      left: 8px;
+      border-top-right-radius: 70px;
+      border-bottom-right-radius: 70px;
+      cursor: pointer;
+  }
+  /*#leftBox #line .leftbtn {
+      width: 20px;
+      background-color: blue;
+      filter: alpha(opacity=50);
+      -moz-opacity: 0.50;
+      opacity: 0.50;
+      height: 50px;
+      position: absolute;
+      top: 48%;
+      left: -20px;
+      border-top-left-radius: 70px;
+      border-bottom-left-radius: 70px;
+      cursor: pointer;
+  }*/
+  
+  #leftBox #line .btn:hover {
+      box-shadow: 0 0 10px #ccc;
+  }
+  
+  #right::-webkit-scrollbar,
+  #left::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+  }
+  
+  #right::-webkit-scrollbar-track,
+  #left::-webkit-scrollbar-track {
+      border: 1px #d3d3d3 solid;
+      box-shadow: 0px 0px 3px #dfdfdf inset;
+      border-radius: 10px;
+      background: #eee;
+  }
+  
+  #right::-webkit-scrollbar-thumb,
+  #left::-webkit-scrollbar-thumb {
+      border: 1px #808080 solid;
+      border-radius: 10px;
+      background: #999;
+  }
+  
+  #topBox {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      overflow: hidden;
+  }
+  
+  #topBox>div {
+      position: absolute;
+      width: 100%;
+  }
+  
+  #topBox #top,
+  #topBox #bottom {
+      overflow: auto;
+  }
+  
+  #topBox #top {
+      height: 30%;
+  }
+  
+  #topBox #bottom {
+      top: 32%;
+      height: 100%;
+  }
+  
+  #topBox #line {
+      top: 30%;
+      height: 8px;
+      background: #CCC;
+      cursor: n-resize;
+      border-radius: 2px;
+  }
+  
+  #topBox #line #lineDot {
+      position: absolute;
+      left: 50%;
+      margin-left: -11px;
+  }
+  
+  #topBox #line #lineDot ul li {
+      list-style: none;
+      height: 6px;
+      width: 6px;
+      background-color: white;
+      margin-top: 1px;
+      margin-right: 3px;
+      border-radius: 50%;
+      float: left;
+  }
+  
+  .btns_open {
+      background: url(../img/left-hover2.png) no-repeat center;
+  }
+  
+  .btns_close {
+      background: url(../img/left1-hover2.png) no-repeat center;
+  }
+  
+  .Topbtns_open {
+      background: url(../img/down-hover2.png) no-repeat center;
+  }
+  
+  .Topbtns_close {
+      background: url(../img/up1-hover2.png) no-repeat center;
+  }
+  
+  #topBox #line .Topbtns {
+      width: 66px;
+      height: 20px !important;
+      background-color: #57afef;
+      opacity: 0.50;
+      height: 30px;
+      position: absolute;
+      left: 50%;
+      margin-left: -33px;
+      margin-top: 8px;
+      border-bottom-right-radius: 60px;
+      border-bottom-left-radius: 60px;
+      cursor: pointer;
+  }
+  
+  #top::-webkit-scrollbar,
+  #bottom::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+  }
+  
+  #top::-webkit-scrollbar-track,
+  #bottom::-webkit-scrollbar-track {
+      border: 1px #d3d3d3 solid;
+      box-shadow: 0px 0px 3px #dfdfdf inset;
+      border-radius: 10px;
+      background: #eee;
+  }
+  
+  #top::-webkit-scrollbar-thumb,
+  #bottom::-webkit-scrollbar-thumb {
+      border: 1px #808080 solid;
+      border-radius: 10px;
+      background: #999;
+  }

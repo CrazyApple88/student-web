@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.dict.dao.DictDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dict.entity.DictEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dict.entity.DictEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_dict t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_dict
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="dictName != null and dictName.trim() != ''">
+				and dict_name like '%${dictName}%'
+			</if>
+			<if test="dictCode != null and dictCode.trim() != ''">
+				and dict_code = #{dictCode}
+			</if>
+			<if test="typeId != null and typeId.trim() != ''">
+				and type_id = #{typeId}
+			</if>
+			<if test="sort != null and sort != '0'">
+				and sort = #{sort}
+			</if>
+			<if test="intro != null and intro.trim() != ''">
+				and intro = #{intro}
+			</if>
+		</where>
+	</sql>
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.dict.entity.DictEntity"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_dict
+		(
+		id,
+		dict_name,
+		dict_code,
+		type_id,
+		sort,
+		intro
+		)
+		values
+		(
+		#{id},
+		#{dictName},
+		#{dictCode},
+		#{typeId},
+		#{sort},
+		#{intro}
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.dict.entity.DictEntity">
+		update tb_sys_dict
+		<set>
+			<if test="dictName != null"> dict_name = #{dictName}, </if>
+			<if test="dictCode != null"> dict_code = #{dictCode}, </if>
+			<if test="typeId != null"> type_id = #{typeId}, </if>
+			<if test="sort != null and sort != '0'"> sort = #{sort}, </if>
+			<if test="intro != null"> intro = #{intro}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.dict.entity.DictEntity">
+		delete from tb_sys_dict where
+		id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_dict where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.dict.entity.DictEntity">
+		select * from tb_sys_dict where id =
+		#{id}
+	</select>
+
+	<!-- 查询不分页列表 -->
+	<select id="queryAllObj" resultType="com.xhgx.web.admin.dict.entity.DictEntity">
+		select * from
+		tb_sys_dict
+		where type_id = #{typeId}
+		order by sort
+	</select>
+	
+	<!-- 根据字典类型code查询字典类型id -->
+	<select id="getByDictCode" resultType="com.xhgx.web.admin.dict.entity.DictEntity">
+		select * from
+		tb_sys_dict where dict_code = #{dictCode}
+	</select>
+	
+	<!-- 根据字典类型ID删除字典表中数据 -->
+	<delete id="deleteDictByDicttypeId" parameterType="com.xhgx.web.admin.dict.entity.DictEntity">
+		delete from tb_sys_dict where
+		type_id = #{typeId}
+	</delete>
+	<!-- 根据code和type进行查询,用于验证dict_code是否重复 -->
+	<select id="getByDictCodeAndType" resultType="com.xhgx.web.admin.dict.entity.DictEntity" parameterType="map">
+		select * from
+		tb_sys_dict where dict_code = #{dictCode} and type_id=#{typeId}
+	</select>
+</mapper>

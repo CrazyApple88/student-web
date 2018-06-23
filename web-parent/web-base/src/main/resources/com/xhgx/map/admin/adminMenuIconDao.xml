@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.menuIcon.dao.MenuIconDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.menuIcon.entity.MenuIcon"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.menuIcon.entity.MenuIcon"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select t.* from
+		(select i.*,d.dict_name type_name
+		from tb_sys_menu_icon i
+		left join tb_sys_dict d on d.dict_code=i.type_id)t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_menu_icon
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="iconName != null and iconName.trim() != ''">
+				and icon_name like '%${iconName}%'
+			</if>
+			<if test="typeId != null and typeId.trim() != ''">
+				and type_id like '%${typeId}%'
+			</if>
+			<if test="className != null and className.trim() != ''">
+				and class_name like '%${className}%'
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				and create_by like '%${createBy}%'
+			</if>
+			<if test="createTime != null and createTime.trim() != ''">
+				and create_time = #{createTime} 
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+			<if test="createTimeStart != null and createTimeStart.trim() != ''">
+			    <![CDATA[   AND create_time >= to_date('${createTimeStart}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="createTimeEnd != null and createTimeEnd.trim() != ''">
+			    <![CDATA[  AND create_time <= to_date('${createTimeEnd}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+			<if test="createTimeStart != null and createTimeStart.trim() != ''">
+			    <![CDATA[   AND create_time >= '${createTimeStart}'   ]]>
+			</if>
+			<if test="createTimeEnd != null and createTimeEnd.trim() != ''">
+			    <![CDATA[  AND create_time <= '${createTimeEnd}'   ]]>
+			</if>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.menuIcon.entity.MenuIcon"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_menu_icon
+		(
+		id,			 
+		icon_name,	
+		type_id,		 
+		class_name,			 
+		create_by,			 
+		create_time			 
+		)
+		values
+		(
+		#{id},			 
+		#{iconName},
+		#{typeId},			 
+		#{className},			 
+		#{createBy},			 
+		#{createTime}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.menuIcon.entity.MenuIcon">
+		update tb_sys_menu_icon
+		<set>
+				<if test="iconName != null"> icon_name = #{iconName}, </if>
+				<if test="typeId != null"> type_id = #{typeId}, </if>
+				<if test="className != null"> class_name = #{className}, </if>
+				<if test="createBy != null"> create_by = #{createBy}, </if>
+				<if test="createTime != null"> create_time = #{createTime}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.menuIcon.entity.MenuIcon">
+		delete from tb_sys_menu_icon
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_menu_icon where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.menuIcon.entity.MenuIcon">
+		select * from tb_sys_menu_icon where
+		id = #{id}
+	</select>
+
+</mapper>

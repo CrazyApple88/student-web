@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.menu.dao.MenuCenterDao">
+
+
+	<!-- 单个绑定关联表和权限菜单关系 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.menu.entity.MenuCenterEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id" >
+		insert into tb_sys_menu_center(id,menu_id,relation_id,relation_type,auth_type) 
+		values
+		(#{id},#{menuId},#{relationId},#{relationType},#{authType})
+	</insert>
+	
+	<!-- 批量绑定关联表和权限菜单关系 -->
+	<insert id="saveMenuCenterBatch" parameterType="java.util.List"  useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into tb_sys_menu_center(id,menu_id,relation_id,relation_type,auth_type) 
+		values
+		<foreach collection="list" item="item" index="index" separator="," >  
+		(#{item.id},#{item.menuId},#{item.relationId},#{item.relationType},#{item.authType})
+		</foreach>
+	</insert>
+	
+	<!-- 删除关联表和权限菜单关系 -->
+	<delete id="deleteMenuCentersByMenuCenter">
+		delete from tb_sys_menu_center 
+		where relation_id = #{relationId} 
+		and relation_type = #{relationType} 
+		<if test="authType != null and authType.trim() != ''">
+			and auth_type = #{authType}
+		</if>
+		
+	</delete>
+	
+	<!-- 删除关联表和权限菜单关系 -->
+	<delete id="deleteMenuCentersByMenuId">
+		delete from tb_sys_menu_center where menu_id = #{menuId}
+	</delete>
+	
+</mapper>

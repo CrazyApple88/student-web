@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.scheduler.dao.SchedulerHistoryDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_scheduler_history t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_scheduler_history
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="name != null and name.trim() != ''">
+				and name like '%${name}%'
+			</if>
+			<if test="groupName != null and groupName.trim() != ''">
+				and group_Name like '%${groupName}%'
+			</if>
+			<if test="result != null and result.trim() != ''">
+				and result like '%${result}%'
+			</if>
+			<if test="startTime != null and startTime.trim() != ''">
+				and start_Time = #{startTime}
+			</if>
+			<if test="endTime != null and endTime.trim() != ''">
+				and end_Time = #{endTime}
+			</if>
+			<if test="totalTime != null and totalTime.trim() != ''">
+				and total_Time like '%${totalTime}%'
+			</if>
+			<if test="count != null and count.trim() != ''">
+				and count = #{count}
+			</if>
+			
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_scheduler_history
+		(
+		id,			 
+		name,			 
+		group_Name,			 
+		result,			 
+		start_Time,			 
+		end_Time,			 
+		total_Time,			 
+		count			 
+		)
+		values
+		(
+		#{id},			 
+		#{name},			 
+		#{groupName},			 
+		#{result},			 
+		#{startTime},			 
+		#{endTime},			 
+		#{totalTime},			 
+		#{count}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory">
+		update tb_sys_scheduler_history
+		<set>
+				<if test="name != null"> name = #{name}, </if>
+				<if test="groupName != null"> group_Name = #{groupName}, </if>
+				<if test="result != null"> result = #{result}, </if>
+				<if test="startTime != null"> start_Time = #{startTime}, </if>
+				<if test="endTime != null"> end_Time = #{endTime}, </if>
+				<if test="totalTime != null"> total_Time = #{totalTime}, </if>
+				<if test="count != null"> count = #{count}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory">
+		delete from tb_sys_scheduler_history
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_scheduler_history where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.scheduler.entity.SchedulerHistory">
+		select * from tb_sys_scheduler_history where
+		id = #{id}
+	</select>
+
+</mapper>

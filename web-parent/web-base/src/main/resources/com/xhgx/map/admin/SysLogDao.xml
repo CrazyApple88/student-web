@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.log.dao.LogDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.log.entity.LogEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.log.entity.LogEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_log t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_log 
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id} 
+			</if>
+			<if test="type != null and type.trim() != '' and type != '0'">
+				and type = #{type} 
+			</if>
+			<if test="title != null and title.trim() != ''">
+				and title = #{title} 
+			</if>
+			<if test="requestUrl != null and requestUrl.trim() != ''">
+				and request_url = #{requestUrl} 
+			</if>
+			<if test="method != null and method.trim() != ''">
+				and method = #{method} 
+			</if>
+			<if test="params != null and params.trim() != ''">
+				and params = #{params} 
+			</if>
+			<if test="exception != null and exception.trim() != ''">
+				and exception = #{exception} 
+			</if>
+			<if test="remoteAddr != null and remoteAddr.trim() != ''">
+				and remote_addr = #{remoteAddr} 
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				and create_by like '%${createBy}%'
+			</if>
+			<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+		<if test="startTime != null and startTime.trim() != ''">
+		    <![CDATA[  AND create_date >= to_date('${startTime}','yyyy-mm-dd hh24:mi:ss')   ]]>
+		</if>
+		<if test="endTime != null and endTime.trim() != ''">
+		    <![CDATA[  AND create_date <= to_date('${endTime}','yyyy-mm-dd hh24:mi:ss')   ]]>
+		</if>
+	</sql>
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+		<if test="startTime != null and startTime.trim() != ''">
+		    <![CDATA[   AND create_date >= '${startTime}'   ]]>
+		</if>
+		<if test="endTime != null and endTime.trim() != ''">
+		    <![CDATA[  AND create_date <= '${endTime}'   ]]>
+		</if>
+	</sql>
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.log.entity.LogEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id"   >
+		insert into tb_sys_log
+			(
+				id,
+				type,
+				title,
+				request_url,
+				method,
+				params,
+				exception,
+				remote_addr,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#{id},
+				#{type},
+				#{title},
+				#{requestUrl},
+				#{method},
+				#{params},
+				#{exception},
+				#{remoteAddr},
+				#{createBy},
+				#{createDate}
+			)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.log.entity.LogEntity">
+		update tb_sys_log
+		<set>
+			<if test="type != null and type != '0'"> type  = #{type}, </if>
+			<if test="title != null"> title  = #{title}, </if>
+			<if test="requestUrl != null"> request_url  = #{requestUrl}, </if>
+			<if test="method != null"> method  = #{method}, </if>
+			<if test="params != null"> params  = #{params}, </if>
+			<if test="exception != null"> exception  = #{exception}, </if>
+			<if test="remoteAddr != null"> remote_addr  = #{remoteAddr}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.log.entity.LogEntity">
+		delete from tb_sys_log where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_log where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.log.entity.LogEntity">
+		select * from tb_sys_log where id = #{id}
+	</select>
+	
+</mapper>

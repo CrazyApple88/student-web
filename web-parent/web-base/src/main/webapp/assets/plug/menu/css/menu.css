@@ -1,0 +1,40 @@
+
+.sidebar-collapse .iconfont{
+    left: 12px;
+}
+.iconfont{
+    position: absolute;
+    font-size: 14px;
+}
+.icon-zhankai,.icon-yousanjiao{
+    right: 12px;
+}
+.sidebar-menu li.open>a i.icon-zhankai {
+    -webkit-transform: rotate(180deg);
+    -ms-transform: rotate(180deg);
+    -o-transform: rotate(180deg);
+    transform: rotate(180deg);
+}
+.streak .submenu {
+    position: absolute;
+    top: 0;
+    left: 360px;
+}
+
+
+
+.menu-compact li .icon-zhankai{
+    display: none;
+}
+
+
+
+.menu-compact li:hover .submenu .icon-zhankai{
+    display: block;
+    top: 0;
+}
+
+
+
+
+

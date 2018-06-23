@@ -1,0 +1,15 @@
+.sort-icon{
+	display:inline-block;
+	width:20px;
+	height:30px;
+	float:right;
+}
+.sorting .sort-icon{
+    background: url("../img/sort_both.png")  center right no-repeat; 
+}
+.sorting_asc .sort-icon{
+    background: url("../img/sort_asc.png")  center right no-repeat;   
+}
+.sorting_desc .sort-icon{
+    background: url("../img/sort_desc.png") center right no-repeat;
+}

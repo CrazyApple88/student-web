@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.message.dao.MessageDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.message.entity.Message"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.message.entity.Message"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_message t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_message t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="title != null and title.trim() != ''">
+				and title like '%${title}%'
+			</if>
+			<if test="content != null and content.trim() != ''">
+				and content like '%${content}%'
+			</if>
+			<if test="type != null and type.trim() != ''">
+				and type like '%${type}%'
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				and create_by like '%${createBy}%'
+			</if>
+			<if test="createTime != null and createTime.trim() != ''">
+				and create_time = #{createTime} 
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+			<if test="startTime != null and startTime.trim() != ''">
+			    <![CDATA[   AND create_time >= to_date('${startTime}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="endTime != null and endTime.trim() != ''">
+			    <![CDATA[  AND create_time <= to_date('${endTime}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+			<if test="startTime != null and startTime.trim() != ''">
+			    <![CDATA[   AND create_time >= '${startTime}'   ]]>
+			</if>
+			<if test="endTime != null and endTime.trim() != ''">
+			    <![CDATA[  AND create_time <= '${endTime}'   ]]>
+			</if>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.message.entity.Message"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_message
+		(
+		id,			 
+		title,			 
+		content,			 
+		type,			 
+		create_by,			 
+		create_time			 
+		)
+		values
+		(
+		#{id},			 
+		#{title},			 
+		#{content},			 
+		#{type},			 
+		#{createBy},			 
+		#{createTime}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.message.entity.Message">
+		update tb_sys_message
+		<set>
+				<if test="title != null"> title = #{title}, </if>
+				<if test="content != null"> content = #{content}, </if>
+				<if test="type != null"> type = #{type}, </if>
+				<if test="createBy != null"> create_by = #{createBy}, </if>
+				<if test="createTime != null"> create_time = #{createTime}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.message.entity.Message">
+		delete from tb_sys_message
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_message where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.message.entity.Message">
+		select * from tb_sys_message where
+		id = #{id}
+	</select>
+	<!-- 根据消息id查询所有消息接收者的用户信息 -->
+	<select id="getUsersByMsgId" resultType="map">
+		select mu.user_id USERID,u.user_name USERNAME,u.real_name REALNAME,m.id ID
+		from tb_sys_message m,tb_sys_msg_user mu,tb_sys_user u
+		where m.id=mu.msg_id and mu.user_id=u.id and m.id=#{id}
+	</select>
+	<!-- 根据用户id查询所有接收到的信息 -->
+	<select id="getMsgByUserId" resultType="map" parameterType="map">
+		select m.id ID,m.title TITLE,m.type TYPE,m.receive_type RECEIVE,m.create_by CREATEBY,m.content CONTENT,m.create_time CREATETIME,mu.`status` STATUS
+		from tb_sys_message m,tb_sys_msg_user mu
+		where m.id=mu.msg_id and mu.user_id=#{userId}
+		<if test="title != null and title !=''">
+			and title like '%${title}%'
+		</if>
+		<if test="status !=null and status.trim() !=''">
+			and mu.status =#{status}
+		</if>
+		<include refid="baseWhereByDatabaseType" />
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by m.${orderBy} 
+		</if>
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!-- 根据用户id条件查询所有接收到的信息的数量 -->
+	<select id="countMsgByUserId" resultType="int" parameterType="map">
+		select count(mu.id)
+		from tb_sys_message m,tb_sys_msg_user mu
+		where m.id=mu.msg_id and mu.user_id=#{userId}
+		<if test="title != null and title.trim() !=''">
+			and title like '%${title}%'
+		</if>
+		<if test="status !=null and status.trim() !=''">
+			and mu.status =#{status}
+		</if>
+		<include refid="baseWhereByDatabaseType" />
+		<if test="offset != null and limit != null">
+			limit #{offset}, #{limit}
+		</if>
+	</select>
+	<!-- 根据用户id查询所有未读信息的数量-->
+	<select id="countUnMsgByUserId" resultType="int">
+		select count(mu.id)
+		from tb_sys_message m,tb_sys_msg_user mu
+		where m.id=mu.msg_id and mu.user_id=#{userId} and mu.status='0'
+		
+	</select>
+</mapper>

@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.userToken.dao.UserTokenDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.userToken.entity.UserToken"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.userToken.entity.UserToken"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_user_token t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_user_token
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="userId != null and userId.trim() != ''">
+				and user_id like '%${userId}%'
+			</if>
+			<if test="token != null and token.trim() != ''">
+				and token like '%${token}%'
+			</if>
+			<if test="activeTime != null and activeTime.trim() != ''">
+				and active_time = #{activeTime} 
+			</if>
+			<if test="lastLoginTime != null and lastLoginTime.trim() != ''">
+				and last_login_time = #{lastLoginTime} 
+			</if>
+			<if test="deviceId != null and deviceId.trim() != ''">
+				and device_id like '%${deviceId}%'
+			</if>
+			<if test="app != null and app.trim() != ''">
+				and app like '%${app}%'
+			</if>
+			<if test="remark != null and remark.trim() != ''">
+				and remark like '%${remark}%'
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+			<if test="activeTimeStart != null and activeTimeStart.trim() != ''">
+			    <![CDATA[   AND active_time >= to_date('${activeTimeStart}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="activeTimeEnd != null and activeTimeEnd.trim() != ''">
+			    <![CDATA[  AND active_time <= to_date('${activeTimeEnd}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="lastLoginTimeStart != null and lastLoginTimeStart.trim() != ''">
+			    <![CDATA[   AND last_login_time >= to_date('${lastLoginTimeStart}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="lastLoginTimeEnd != null and lastLoginTimeEnd.trim() != ''">
+			    <![CDATA[  AND last_login_time <= to_date('${lastLoginTimeEnd}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+			<if test="activeTimeStart != null and activeTimeStart.trim() != ''">
+			    <![CDATA[   AND active_time >= '${activeTimeStart}'   ]]>
+			</if>
+			<if test="activeTimeEnd != null and activeTimeEnd.trim() != ''">
+			    <![CDATA[  AND active_time <= '${activeTimeEnd}'   ]]>
+			</if>
+			<if test="lastLoginTimeStart != null and lastLoginTimeStart.trim() != ''">
+			    <![CDATA[   AND last_login_time >= '${lastLoginTimeStart}'   ]]>
+			</if>
+			<if test="lastLoginTimeEnd != null and lastLoginTimeEnd.trim() != ''">
+			    <![CDATA[  AND last_login_time <= '${lastLoginTimeEnd}'   ]]>
+			</if>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.userToken.entity.UserToken"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_user_token
+		(
+		id,			 
+		user_id,			 
+		token,			 
+		active_time,			 
+		last_login_time,			 
+		device_id,			 
+		app,			 
+		remark			 
+		)
+		values
+		(
+		#{id},			 
+		#{userId},			 
+		#{token},			 
+		#{activeTime},			 
+		#{lastLoginTime},			 
+		#{deviceId},			 
+		#{app},			 
+		#{remark}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.userToken.entity.UserToken">
+		update tb_sys_user_token
+		<set>
+				<if test="userId != null"> user_id = #{userId}, </if>
+				<if test="token != null"> token = #{token}, </if>
+				<if test="activeTime != null"> active_time = #{activeTime}, </if>
+				<if test="lastLoginTime != null"> last_login_time = #{lastLoginTime}, </if>
+				<if test="deviceId != null"> device_id = #{deviceId}, </if>
+				<if test="app != null"> app = #{app}, </if>
+				<if test="remark != null"> remark = #{remark}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.userToken.entity.UserToken">
+		delete from tb_sys_user_token
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_user_token where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.userToken.entity.UserToken">
+		select * from tb_sys_user_token where
+		id = #{id}
+	</select>
+	
+	<select id="getUserId" resultType="String">
+		select user_id from tb_sys_user_token where
+		token = #{token}
+	</select>
+
+</mapper>

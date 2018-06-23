@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.dataRecover.dao.DataRecoverDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dataRecover.entity.DataRecover"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.dataRecover.entity.DataRecover"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_data_recover t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_data_recover
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="recoverCode != null and recoverCode.trim() != ''">
+				and recover_code like '%${recoverCode}%'
+			</if>
+			<if test="tableName != null and tableName.trim() != ''">
+				and table_name like '%${tableName}%'
+			</if>
+			<if test="status != null and status.trim() != ''">
+				and status like '%${status}%'
+			</if>
+			<if test="data != null and data.trim() != ''">
+				and data like '%${data}%'
+			</if>
+			<if test="createBy != null and createBy.trim() != ''">
+				and create_by like '%${createBy}%'
+			</if>
+			<if test="createDate != null and createDate.trim() != ''">
+				and create_date = #{createDate} 
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+			<if test="createDateStart != null and createDateStart.trim() != ''">
+			    <![CDATA[   AND create_date >= to_date('${createDateStart}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="createDateEnd != null and createDateEnd.trim() != ''">
+			    <![CDATA[  AND create_date <= to_date('${createDateEnd}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+			<if test="createDateStart != null and createDateStart.trim() != ''">
+			    <![CDATA[   AND create_date >= '${createDateStart}'   ]]>
+			</if>
+			<if test="createDateEnd != null and createDateEnd.trim() != ''">
+			    <![CDATA[  AND create_date <= '${createDateEnd}'   ]]>
+			</if>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.dataRecover.entity.DataRecover"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_data_recover
+		(
+		id,			 
+		recover_code,			 
+		table_name,			 
+		status,			 
+		data,			 
+		create_by,			 
+		create_date			 
+		)
+		values
+		(
+		#{id},			 
+		#{recoverCode},			 
+		#{tableName},			 
+		#{status},			 
+		#{data},			 
+		#{createBy},			 
+		#{createDate}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.dataRecover.entity.DataRecover">
+		update tb_sys_data_recover
+		<set>
+				<if test="recoverCode != null"> recover_code = #{recoverCode}, </if>
+				<if test="tableName != null"> table_name = #{tableName}, </if>
+				<if test="status != null"> status = #{status}, </if>
+				<if test="data != null"> data = #{data}, </if>
+				<if test="createBy != null"> create_by = #{createBy}, </if>
+				<if test="createDate != null"> create_date = #{createDate}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.dataRecover.entity.DataRecover">
+		delete from tb_sys_data_recover
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_data_recover where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.dataRecover.entity.DataRecover">
+		select * from tb_sys_data_recover where
+		id = #{id}
+	</select>
+
+</mapper>

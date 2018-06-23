@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.config.dao.ConfigDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.config.entity.ConfigEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.config.entity.ConfigEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_config t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_config 
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id} 
+			</if>
+			<if test="name != null and name.trim() != ''">
+				and name like '%${name}%'
+			</if>
+			<if test="code != null and code.trim() != ''">
+				and code = #{code} 
+			</if>
+			<if test="value != null and value.trim() != ''">
+				and value = #{value} 
+			</if>
+			<if test="intro != null and intro.trim() != ''">
+				and intro = #{intro} 
+			</if>
+			
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.config.entity.ConfigEntity" useGeneratedKeys="true" keyColumn="id" keyProperty="id"   >
+		insert into tb_sys_config
+			(
+				id,
+				name,
+				code,
+				value,
+				intro,
+				create_by,
+				create_date
+			)
+			values
+			(
+				#{id},
+				#{name},
+				#{code},
+				#{value},
+				#{intro},
+				#{createBy},
+				#{createDate}
+			)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.config.entity.ConfigEntity">
+		update tb_sys_config
+		<set>
+			<if test="name != null"> name  = #{name}, </if>
+			<if test="code != null"> code  = #{code}, </if>
+			<if test="value != null"> value  = #{value}, </if>
+			<if test="intro != null"> intro  = #{intro}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.config.entity.ConfigEntity">
+		delete from tb_sys_config where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_config where id in
+		<foreach item="ids" collection="array" open="(" separator="," close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.config.entity.ConfigEntity">
+		select * from tb_sys_config where id = #{id}
+	</select>
+	
+</mapper>

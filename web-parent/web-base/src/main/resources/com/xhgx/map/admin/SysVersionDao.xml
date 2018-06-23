@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.version.dao.VersionDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.version.entity.Version"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.version.entity.Version"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_version
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by #{orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_version
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="name != null and name.trim() != ''">
+				and name like '%${name}%'
+			</if>
+			<if test="code != null and code.trim() != ''">
+				and code like '%${code}%'
+			</if>
+			<if test="updateInfo != null and updateInfo.trim() != ''">
+				and update_info like '%${updateInfo}%'
+			</if>
+			<if test="updateBy != null and updateBy.trim() != ''">
+				and update_by like '%${updateBy}%'
+			</if>
+			<if test="updateDate != null and updateDate.trim() != ''">
+				and update_date = #{updateDate}
+			</if>
+			<if test="remark != null and remark.trim() != ''">
+				and remark like '%${remark}%'
+			</if>
+			
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.version.entity.Version"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_version
+		(
+		id,			 
+		name,			 
+		code,			 
+		update_info,			 
+		update_by,			 
+		update_date,			 
+		remark			 
+		)
+		values
+		(
+		#{id},			 
+		#{name},			 
+		#{code},			 
+		#{updateInfo},			 
+		#{updateBy},			 
+		#{updateDate},			 
+		#{remark}			 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.version.entity.Version">
+		update tb_sys_version
+		<set>
+				<if test="name != null"> name = #{name}, </if>
+				<if test="code != null"> code = #{code}, </if>
+				<if test="updateInfo != null"> update_info = #{updateInfo}, </if>
+				<if test="updateBy != null"> update_by = #{updateBy}, </if>
+				<if test="updateDate != null"> update_date = #{updateDate}, </if>
+				<if test="remark != null"> remark = #{remark}, </if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.version.entity.Version">
+		delete from tb_sys_version
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_version where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.version.entity.Version">
+		select * from tb_sys_version where
+		id = #{id}
+	</select>
+
+</mapper>

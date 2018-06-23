@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.manager.dao.ManagerDao">
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.manager.entity.Manager"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.manager.entity.Manager"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_manager t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_manager
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and ID = #{id}
+			</if>
+			<if test="sysName != null and sysName.trim() != ''">
+				and sys_name like '%${sysName}%'
+			</if>
+			<if test="copyright != null and copyright.trim() != ''">
+				and copyright like '%${copyright}%'
+			</if>
+			<if test="recordLicense != null and recordLicense.trim() != ''">
+				and record_license like '%${recordLicense}%'
+			</if>
+			<if test="logo != null and logo.trim() != ''">
+				and logo like '%${logo}%'
+			</if>
+			<if test="compId != null and compId.trim() != ''">
+				and comp_id like '%${compId}%'
+			</if>
+			<if test="wechatCode != null and wechatCode.trim() != ''">
+				and wechat_code like '%${wechatCode}%'
+			</if>
+			<if test="createDt != null and createDt.trim() != ''">
+				and create_dt = #{createDt} 
+			</if>
+			<if test="state != null">
+				and state = #{state} 
+			</if>
+		<!-- 如果是时间格式将时间格式分数据库比较时间段 -->
+		<include refid="baseWhereByDatabaseType" />
+		</where>
+	</sql>
+	
+	
+	<!--  oracle时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="oracle">
+			<if test="createDtStart != null and createDtStart.trim() != ''">
+			    <![CDATA[   AND create_dt >= to_date('${createDtStart}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+			<if test="createDtEnd != null and createDtEnd.trim() != ''">
+			    <![CDATA[  AND create_dt <= to_date('${createDtEnd}','yyyy-mm-dd hh24:mi:ss')   ]]>
+			</if>
+	</sql>
+	<!-- msyql时间比较方式 -->
+	<sql id="baseWhereByDatabaseType" databaseId="mysql">
+			<if test="createDtStart != null and createDtStart.trim() != ''">
+			    <![CDATA[   AND create_dt >= '${createDtStart}'   ]]>
+			</if>
+			<if test="createDtEnd != null and createDtEnd.trim() != ''">
+			    <![CDATA[  AND create_dt <= '${createDtEnd}'   ]]>
+			</if>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.manager.entity.Manager"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_manager
+		(
+		ID,			 
+		sys_name,			 
+		copyright,			 
+		record_license,			 
+		logo,			 
+		comp_id,			 
+		wechat_code,			 
+		create_dt,
+		state 
+		)
+		values
+		(
+		#{id},			 
+		#{sysName},			 
+		#{copyright},			 
+		#{recordLicense},			 
+		#{logo},			 
+		#{compId},			 
+		#{wechatCode},			 
+		#{createDt},
+		#{state}	 
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.manager.entity.Manager">
+		update tb_sys_manager
+		<set>
+				<if test="sysName != null"> sys_name = #{sysName}, </if>
+				<if test="copyright != null"> copyright = #{copyright}, </if>
+				<if test="recordLicense != null"> record_license = #{recordLicense}, </if>
+				<if test="logo != null"> logo = #{logo}, </if>
+				<if test="compId != null"> comp_id = #{compId}, </if>
+				<if test="wechatCode != null"> wechat_code = #{wechatCode}, </if>
+				<if test="createDt != null"> create_dt = #{createDt}, </if>
+				<if test="state != null"> state = #{state}</if>
+		</set>
+		where id = #{ id }
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.manager.entity.Manager">
+		delete from tb_sys_manager
+		where id = #{ id }
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_manager where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids }
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.manager.entity.Manager">
+		select * from tb_sys_manager where
+		id = #{id}
+	</select>
+</mapper>

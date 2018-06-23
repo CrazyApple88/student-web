@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xhgx.web.admin.company.dao.CompanyDao">
+
+
+	<!-- oracle数据库分页查询数据模板  -->
+	<select id="queryList" resultType="com.xhgx.web.admin.company.entity.CompanyEntity"  databaseId="oracle">
+		<if test="offset != null and limit != null">
+			<![CDATA[  SELECT * FROM (  SELECT a.*, ROWNUM rn FROM (  ]]> 
+		</if>
+		
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+			<![CDATA[ ) a  WHERE ROWNUM <= (#{limit}+#{offset}) )  ]]> 
+			<![CDATA[ WHERE rn >= (#{offset}+1) ]]>
+		</if>
+	</select>
+	
+	<!-- mysql数据库分页查询数据模板 -->
+	<select id="queryList" resultType="com.xhgx.web.admin.company.entity.CompanyEntity"  databaseId="mysql">
+		<include refid="queryListData" />
+
+		<if test="offset != null and limit != null">
+				limit #{offset}, #{limit}
+		</if>
+	</select>
+	
+	<!-- 查询数据 -->
+	<sql id="queryListData">
+		select * from tb_sys_company t
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+
+		<if test="orderBy != null and orderBy.trim() != ''">
+			order by t.${orderBy}
+		</if>
+	</sql>
+
+
+	<!-- 根据条件查询数量 -->
+	<select id="queryCount" resultType="int">
+		select count(*) from tb_sys_company
+		<if test="_parameter != null">
+			<include refid="baseWhereClause" />
+		</if>
+	</select>
+
+	<!-- 查询where条件，可直接引用，防止重复写 -->
+	<sql id="baseWhereClause">
+		<where>
+			<if test="id != null and id.trim() != ''">
+				and id = #{id}
+			</if>
+			<if test="compName != null and compName.trim() != ''">
+				and comp_name like '%${compName}%'
+			</if>
+			<if test="compNameAll != null and compNameAll.trim() != ''">
+				and comp_name = #{compNameAll}
+			</if>
+			<if test="compCode != null and compCode.trim() != ''">
+				and comp_code like '%${compCode}%'
+			</if>
+			<if test="compCodeAll != null and compCodeAll.trim() != ''">
+				and comp_code = #{compCodeAll}
+			</if>
+			<if test="nameAlias != null and nameAlias.trim() != ''">
+				and name_alias = #{nameAlias}
+			</if>
+			<if test="isReal != null and isReal.trim() != '' and isReal != '0'">
+				and is_real = #{isReal}
+			</if>
+			<if test="realDt != null and realDt.trim() != ''">
+				and real_dt = #{realDt}
+			</if>
+			<if test="personName != null and personName.trim() != ''">
+				and person_name like '%${personName}%'
+			</if>
+			<if test="personMobile != null and personMobile.trim() != ''">
+				and person_mobile = #{personMobile}
+			</if>
+			<if test="longitude != null and longitude.trim() != ''">
+				and longitude = #{longitude}
+			</if>
+			<if test="latitude != null and latitude.trim() != ''">
+				and latitude = #{latitude}
+			</if>
+			<if test="compPhone != null and compPhone.trim() != ''">
+				and comp_phone = #{compPhone}
+			</if>
+			<if test="compAddr != null and compAddr.trim() != ''">
+				and comp_addr = #{compAddr}
+			</if>
+			<if test="useable != null and useable.trim() != '' and useable != '0'">
+				and useable = #{useable}
+			</if>
+		</where>
+	</sql>
+
+
+
+	<!-- 保存信息 -->
+	<insert id="save" parameterType="com.xhgx.web.admin.company.entity.CompanyEntity"
+		useGeneratedKeys="true" keyColumn="id" keyProperty="id">
+		insert into
+		tb_sys_company
+		(
+		id,
+		comp_name,
+		comp_code,
+		name_alias,
+		is_real,
+		real_dt,
+		person_name,
+		person_mobile,
+		longitude,
+		latitude,
+		comp_phone,
+		comp_addr,
+		useable,
+		create_by,
+		create_date
+		)
+		values
+		(
+		#{id},
+		#{compName},
+		#{compCode},
+		#{nameAlias},
+		#{isReal},
+		#{realDt},
+		#{personName},
+		#{personMobile},
+		#{longitude},
+		#{latitude},
+		#{compPhone},
+		#{compAddr},
+		#{useable},
+		#{createBy},
+		#{createDate}
+		)
+	</insert>
+
+	<!-- 修改信息 -->
+	<update id="update" parameterType="com.xhgx.web.admin.company.entity.CompanyEntity">
+		update tb_sys_company
+		<set>
+			<if test="compName != null"> comp_name = #{compName}, </if>
+			<if test="compCode != null"> comp_code = #{compCode}, </if>
+			<if test="nameAlias != null"> name_alias = #{nameAlias}, </if>
+			<if test="isReal != null and isReal != '0'"> is_real = #{isReal}, </if>
+			<if test="realDt != null"> real_dt = #{realDt}, </if>
+			<if test="personName != null"> person_name = #{personName}, </if>
+			<if test="personMobile != null"> person_mobile = #{personMobile}, </if>
+			<if test="longitude != null"> longitude = #{longitude}, </if>
+			<if test="latitude != null"> latitude = #{latitude}, </if>
+			<if test="compPhone != null"> comp_phone = #{compPhone}, </if>
+			<if test="compAddr != null"> comp_addr = #{compAddr}, </if>
+			<if test="useable != null and useable != '0'"> useable = #{useable}, </if>
+		</set>
+		where id = #{id}
+	</update>
+
+
+	<!-- 单条数据删除 -->
+	<delete id="delete" parameterType="com.xhgx.web.admin.company.entity.CompanyEntity">
+		delete from tb_sys_company
+		where id = #{id}
+	</delete>
+
+	<!-- 根据多个ID批量删除 -->
+	<delete id="deleteBatch">
+		delete from tb_sys_company where id in
+		<foreach item="ids" collection="array" open="(" separator=","
+			close=")">
+			#{ids}
+		</foreach>
+	</delete>
+
+	<!-- 根据ID查询信息 -->
+	<select id="get" resultType="com.xhgx.web.admin.company.entity.CompanyEntity">
+		select * from tb_sys_company where
+		id = #{id}
+	</select>
+
+</mapper>

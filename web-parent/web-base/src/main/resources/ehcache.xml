@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache updateCheck="false" name="txswx-ehcache">
+    <diskStore path="java.io.tmpdir"/>
+    <!-- DefaultCache setting. -->
+    <defaultCache maxEntriesLocalHeap="10000" eternal="true" timeToIdleSeconds="300" timeToLiveSeconds="600"
+                  overflowToDisk="true" maxEntriesLocalDisk="100000"/>
+
+
+    <cache name="defaultTemp" maxElementsInMemory="1000000"
+           maxElementsOnDisk="0" eternal="true" overflowToDisk="false"
+           diskPersistent="false" timeToIdleSeconds="119" timeToLiveSeconds="119"
+           diskSpoolBufferSizeMB="50" diskExpiryThreadIntervalSeconds="120"
+           memoryStoreEvictionPolicy="FIFO"/>
+</ehcache>

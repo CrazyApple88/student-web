@@ -1,0 +1,334 @@
+#navbox {
+    height: auto;
+    float: right;
+    margin-right: 15px
+}
+
+.pageBtnStyle .pageNum,
+.pageBtnStyle2 .pageNum,
+.pageBtnStyle3 .pageNum {
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    float: left;
+    margin: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.pageBtnStyle .pageFirLat,
+.pageBtnStyle2 .pageFirLat,
+.pageBtnStyle3 .pageFirLat {
+    width: auto;
+    height: 30px;
+    padding:0 8px;
+}
+
+.pageBtnStyle2 .pageNum,
+.pageBtnStyle3 .pageNum,
+.pageBtnStyle2 .pageNum:hover,
+.pageBtnStyle3 .pageNum:hover,
+.pageBtnStyle3 .active {
+    color: #333;
+}
+
+.pageBtnStyle2 .pageNum,
+.pageBtnStyle2 .pageFirLat,
+.pageBtnStyle3 .pageNum,
+.pageBtnStyle3 .pageFirLat {
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+.pageBtnStyle .pageNum,
+.pageBtn_Stylew .pageNum,
+.pageBtn_Styleg .pageNum {
+    display: block;
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    float: left;
+    margin: 5px;
+    cursor: pointer;
+    position: relative;
+}
+
+.pageBtnStyle .pageFirLat,
+.pageBtn_Stylew .pageFirLat,
+.pageBtn_Styleg .pageFirLat {
+    width: auto;
+    height: 30px;
+    padding:0 8px;
+}
+
+.pageBtn_Stylew .pageNum,
+.pageBtn_Styleg .pageNum,
+.pageBtn_Stylew .pageNum:hover,
+.pageBtn_Styleg .pageNum:hover,
+.pageBtn_Styleg .active {
+    color: #333;
+}
+
+.pageBtn_Stylew .pageNum,
+.pageBtn_Stylew .pageFirLat,
+.pageBtn_Styleg .pageNum,
+.pageBtn_Styleg .pageFirLat {
+    border-radius: 5px;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+}
+
+
+/*閺嶅嘲绱℃稉锟藉閺堝娈戦柈銊ュ瀻*/
+
+.pageBtnStyle .pageNum {
+    box-shadow: 2px 2px 2px #999;
+    -moz-box-shadow: 2px 2px 2px #999;
+    -webkit-box-shadow: 2px 2px 2px #999;
+    color: #1b98af;
+    background: #f5f5f5;
+    border-radius: 30px;
+    -moz-border-radius: 30px;
+    -webkit-border-radius: 30px;
+}
+
+.pageBtnStyle .pageNum:hover {
+    background: #60bfdd;
+    color: #fff;
+}
+
+.pageBtnStyle .pageFirLat {
+    border-radius: 20px;
+    -moz-border-radius: 20px;
+    -webkit-border-radius: 20px;
+}
+
+.pageBtnStyle .bgPreNex {
+    display: block;
+    width: 13px;
+    height: 13px;
+    line-height: 12px;
+    text-align: center;
+    border-radius: 13px;
+    -moz-border-radius: 13px;
+    -webkit-border-radius: 13px;
+    font-size: 16px;
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    margin: auto;
+    background: #60bfdd;
+    color: #fff;
+}
+
+.pageBtnStyle .active {
+    background: #60bfdd;
+    color: #fff;
+}
+
+
+/*閺嶅嘲绱℃禍宀�閺堝娈戦柈銊ュ瀻*/
+
+.pageBtnStyle2 .pageNum {
+    box-shadow: 1px 1px 1px #999;
+    -moz-box-shadow: 1px 1px 1px #999;
+    -webkit-box-shadow: 1px 1px 1px #999;
+    background: #f3f3f3;
+    border: 1px solid #e3e3e3;
+}
+
+.pageBtnStyle2 .pageNum:hover,
+.pageBtnStyle2 .active {
+    background: #535f6d;
+    color: #fff;
+    border: 1px solid #535f6d;
+}
+
+.pageBtn_Stylew .pageNum {
+    box-shadow: 1px 1px 1px #999;
+    -moz-box-shadow: 1px 1px 1px #999;
+    -webkit-box-shadow: 1px 1px 1px #999;
+    background: #f3f3f3;
+    border: 1px solid #e3e3e3;
+}
+
+.pageBtn_Stylew .pageNum:hover,
+.pageBtn_Stylew .active {
+    background: #535f6d;
+    color: #fff;
+    border: 1px solid #535f6d;
+}
+
+
+/*閺嶅嘲绱℃稉澶屽閺堝娈戦柈銊ュ瀻*/
+
+.pageBtnStyle3 .pageNum {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+}
+
+.pageBtnStyle3 .pageNum:hover,
+.pageBtnStyle3 .active {
+    background: #ddd;
+    border: 1px solid #aaa;
+}
+
+.pageBtn_Styleg .pageNum {
+    background: #fff;
+    border: 1px solid #e3e3e3;
+}
+
+.pageBtn_Styleg .pageNum:hover,
+.pageBtn_Styleg .active {
+    background: #ddd;
+    border: 1px solid #aaa;
+}
+
+
+/*閺嶅嘲绱￠崶娑氬閺堝娈戦柈銊ュ瀻*/
+
+.pageBtnStyle4 .pageNum,
+.pageBtnStyle4 .pageFirLat {
+    height: 35px;
+}
+
+.pageBtnStyle4 .pageNum {
+    display: block;
+    width: 35px;
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+    float: left;
+    color: #428bca;
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-right: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.pageBtnStyle4 .pageNum:hover {
+    background: #eee;
+}
+
+.pageBtnStyle4 .pageFirLat {
+    width: auto;
+    padding: 0 10px;
+}
+
+.pageBtnStyle4 .pageFirst {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.pageBtnStyle4 .pageLast {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.pageBtnStyle4 .active,
+.pageBtnStyle4 .active:hover {
+    background: #428bca;
+    color: #fff;
+    border: 1px solid #428bca;
+}
+
+.pageBtn_Stylec .pageNum,
+.pageBtn_Stylec .pageFirLat {
+    height: 35px;
+}
+
+.pageBtn_Stylec .pageNum {
+    display: block;
+    width: 35px;
+    text-align: center;
+    height: 35px;
+    line-height: 35px;
+    float: left;
+    color: #428bca;
+    background: #fff;
+    border: 1px solid #e3e3e3;
+    border-right: none;
+    cursor: pointer;
+    position: relative;
+}
+
+.pageBtn_Stylec .pageNum:hover {
+    background: #eee;
+}
+
+.pageBtn_Stylec .pageFirLat {
+    width: 50px;
+}
+
+.pageBtn_Stylec .pageFirst {
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+}
+
+.pageBtn_Stylec .pageLast {
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-right: 1px solid #e0e0e0;
+}
+
+.pageBtn_Stylec .active,
+.pageBtn_Stylec .active:hover {
+    background: #428bca;
+    color: #fff;
+    border: 1px solid #428bca;
+}
+.pagecont{
+	height:40px;
+	float:none;
+	margin-left:15px;
+}
+.fontpage{
+	display: block;
+    height: 40px;
+    line-height: 40px;
+	float:left;
+}
+.skipcont{
+	width: 140px;
+    height: 40px;
+    line-height: 40px;
+    float: left;
+    margin-left:10px;
+}
+.skippage{
+	width:30px;
+	height:20px;
+	line-height:18px;
+	border:1px solid #ddd;
+	padding-left:3px;
+	margin:10 5px;
+}
+.skipBtn{
+	width:38px;
+	height:20px;
+	line-height:17px;
+	text-align:center;
+	border:1px solid #ddd;
+	background:#eee;
+	box-sizing:border-box;
+	margin:0 5px;
+}
+.limitpagenum{
+	width:45px;
+	height:20px;
+	border:1px solid #ddd;
+	float:left;
+	margin:10px 0 0 10px;
+}
+
+
+
+
